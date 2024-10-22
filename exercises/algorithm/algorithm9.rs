@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -38,6 +38,19 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.count += 1;
+        self.items.push(value);
+        let mut present = self.count;
+        while present > 1 {
+            let parent = self.parent_idx(present);
+            if (self.comparator)(&self.items[present], &self.items[parent]) {
+                self.items.swap(present, parent);
+                present = parent;
+            }
+            else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +71,17 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+        if right > self.count {
+            return left;
+        }
+        if (self.comparator)(&self.items[left], &self.items[right]) {
+            left
+        }
+        else {
+            right
+        }
     }
 }
 
@@ -79,13 +102,35 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+		if self.is_empty() {
+            return None;
+        }
+        let result = self.items[1].clone();
+        self.items[1] = self.items[self.count].clone();
+        self.items.pop();
+        self.count -= 1;
+        
+        if !self.is_empty() {
+            let mut present = 1 as usize;
+            while self.children_present(present) {
+                let child = self.smallest_child_idx(present);
+                if !(self.comparator)(&self.items[present], &self.items[child]) {
+                    self.items.swap(present, child);
+                    present = child;
+                }
+                else {
+                    break;
+                }
+            }
+        }
+
+        Some(result)
     }
 }
 

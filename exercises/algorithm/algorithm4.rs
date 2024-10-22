@@ -3,7 +3,7 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
+
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -51,12 +51,44 @@ where
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
         //TODO
+        if let None = self.root {
+            self.root = Some(Box::new(TreeNode::new(value)));
+            return;
+        }
+        let mut current_node = &mut self.root;
+        while let Some(ref mut node) = *current_node {
+            match value.cmp(&node.value) {
+                Ordering::Less => {
+                    if let None = node.left {
+                        node.left = Some(Box::new(TreeNode::new(value)));
+                        return;
+                    }
+                    current_node = &mut node.left;
+                },
+                Ordering::Greater => {
+                    if let None = node.right {
+                        node.right = Some(Box::new(TreeNode::new(value)));
+                        return;
+                    }
+                    current_node = &mut node.right;
+                },
+                Ordering::Equal => return,
+            }
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        let mut current_node = &self.root;
+        while let Some(ref node) = *current_node {
+            match value.cmp(&node.value) {
+                Ordering::Less => current_node = &node.left,
+                Ordering::Greater => current_node = &node.right,
+                Ordering::Equal => return true,
+            }
+        }
+        false
     }
 }
 
@@ -67,6 +99,27 @@ where
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
         //TODO
+        match value.cmp(&self.value) {
+            Ordering::Less => {
+                if let None = self.left {
+                    self.left = Some(Box::new(TreeNode::new(value)));
+                    return;
+                }
+                else {
+                    self.left.as_mut().unwrap().insert(value);
+                }
+            },
+            Ordering::Greater => {
+                if let None = self.right {
+                    self.right = Some(Box::new(TreeNode::new(value)));
+                    return;
+                }
+                else {
+                    self.right.as_mut().unwrap().insert(value);
+                }
+            },
+            Ordering::Equal => return,
+        }
     }
 }
 

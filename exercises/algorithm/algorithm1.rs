@@ -2,19 +2,22 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
+
+#[allow(unused_imports)]
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
 
 #[derive(Debug)]
-struct Node<T> {
+struct Node<T> 
+{
     val: T,
     next: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Node<T> {
+impl<T> Node<T> 
+{
     fn new(t: T) -> Node<T> {
         Node {
             val: t,
@@ -23,19 +26,22 @@ impl<T> Node<T> {
     }
 }
 #[derive(Debug)]
-struct LinkedList<T> {
+struct LinkedList<T> 
+{
     length: u32,
     start: Option<NonNull<Node<T>>>,
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T> Default for LinkedList<T> 
+{
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T> LinkedList<T> 
+{
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -70,13 +76,36 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+    where
+        T: std::cmp::PartialOrd + Clone,
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+		let mut merged_list = LinkedList::new();
+        let mut a_ptr = list_a.start;
+        let mut b_ptr = list_b.start;
+        while a_ptr.is_some() && b_ptr.is_some() {
+            let a_value = unsafe { &(*a_ptr.unwrap().as_ptr()).val };
+            let b_value = unsafe { &(*b_ptr.unwrap().as_ptr()).val };
+            if a_value <= b_value {
+                merged_list.add(a_value.clone());
+                a_ptr = unsafe { (*a_ptr.unwrap().as_ptr()).next };
+            }
+            else {
+                merged_list.add(b_value.clone());
+                b_ptr = unsafe { (*b_ptr.unwrap().as_ptr()).next };
+            }
         }
+        while a_ptr.is_some() {
+            let value = unsafe { &(*a_ptr.unwrap().as_ptr()).val };
+            merged_list.add(value.clone());
+            a_ptr = unsafe { (*a_ptr.unwrap().as_ptr()).next };
+        }
+        while b_ptr.is_some() {
+            let value = unsafe { &(*b_ptr.unwrap().as_ptr()).val };
+            merged_list.add(value.clone());
+            b_ptr = unsafe { (*b_ptr.unwrap().as_ptr()).next };
+        }
+        merged_list
 	}
 }
 
@@ -103,6 +132,7 @@ where
         }
     }
 }
+
 
 #[cfg(test)]
 mod tests {
